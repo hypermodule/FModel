@@ -47,7 +47,7 @@ public partial class MainWindow
     {
         var newOrUpdated = UserSettings.Default.ShowChangelog;
 #if !DEBUG
-        ApplicationService.ApiEndpointView.FModelApi.CheckForUpdates(UserSettings.Default.UpdateMode);
+        ApplicationService.ApiEndpointView.FModelApi.CheckForUpdates(UserSettings.Default.UpdateMode, true);
 #endif
 
         switch (UserSettings.Default.AesReload)
@@ -69,12 +69,10 @@ public partial class MainWindow
 #endif
         await Task.WhenAll(
             _applicationView.CUE4Parse.VerifyConsoleVariables(),
-            _applicationView.CUE4Parse.VerifyVirtualCache(),
-            _applicationView.CUE4Parse.VerifyContentBuildManifest(),
+            _applicationView.CUE4Parse.VerifyOnDemandArchives(),
             _applicationView.CUE4Parse.InitMappings(),
-            _applicationView.InitImGuiSettings(newOrUpdated),
             _applicationView.InitVgmStream(),
-            _applicationView.InitOodle(),
+            _applicationView.InitImGuiSettings(newOrUpdated),
             Task.Run(() =>
             {
                 if (UserSettings.Default.DiscordRpc == EDiscordRpc.Always)

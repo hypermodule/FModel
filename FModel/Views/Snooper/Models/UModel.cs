@@ -127,6 +127,7 @@ public abstract class UModel : IRenderableModel
         _vertexAttributes[(int) EAttribute.BonesId].Enabled =
             _vertexAttributes[(int) EAttribute.BonesWeight].Enabled = vertices is CSkelMeshVertex[];
 
+        //var vertices = new List<float>();
         Vertices = new float[lod.NumVerts * VertexSize];
         for (int i = 0; i < vertices.Count; i++)
         {
@@ -158,15 +159,20 @@ public abstract class UModel : IRenderableModel
 
             if (vert is CSkelMeshVertex skelVert)
             {
-                var weightsHash = skelVert.UnpackWeights();
-                Vertices[baseIndex + count++] = skelVert.Bone[0];
-                Vertices[baseIndex + count++] = skelVert.Bone[1];
-                Vertices[baseIndex + count++] = skelVert.Bone[2];
-                Vertices[baseIndex + count++] = skelVert.Bone[3];
-                Vertices[baseIndex + count++] = weightsHash[0];
-                Vertices[baseIndex + count++] = weightsHash[1];
-                Vertices[baseIndex + count++] = weightsHash[2];
-                Vertices[baseIndex + count++] = weightsHash[3];
+                var influences = skelVert.Influences;
+
+                // TODO: Not sure what this is used for, but maybe see if we can extend it past NUM_INFLUENCES_UE4
+                var length = Math.Min(influences.Count, CUE4Parse_Conversion.Constants.NUM_INFLUENCES_UE4);
+
+                for (var j = 0; j < length; j++)
+                {
+                    Vertices[baseIndex + count++] = influences[j].Bone;
+                }
+
+                for (var j = 0; j < length; j++)
+                {
+                    Vertices[baseIndex + count++] = influences[j].Weight;
+                }
             }
         }
 
